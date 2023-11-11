@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Express</title>
+</head>
+<body>
+    <form action="http://localhost:3030/book/add" id="form-book" method="POST">
+        <input type="text" placeholder="Author" name="author" style="margin-bottom: 10px;"><br>
+        <input type="text" placeholder="Nama" name="nama" style="margin-bottom: 10px;"><br>
+        <input type="text" placeholder="Page Count" name="page_count" style="margin-bottom: 10px;"><br>
+        <input type="text" placeholder="Publisher" name="publisher" style="margin-bottom: 10px;"><br>
+        <input type="text" placeholder="Year" name="year" style="margin-bottom: 10px;"><br>
+        <button type="submit" id="data">Add Book</button>
+    </form>
+    <table>
+
+    </table>
+
+    <script>
+        document.getElementById('form-book').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const formData = new FormData(e, target);
+
+            try {
+                let response = await fetch('http://localhost/book/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                })
+
+                if (response.ok) {
+                    throw new Error('HTTP error ! status:' + response.status)
+                }
+
+                const result = await response.json()
+                console.log(result)
+                getData();
+            } catch (error) {
+                console.log(error)
+            }
+        })
+
+        const getData = async() => {
+            const response = await fetch('http://localhost:3030/book/all')
+            const res = await response.json()
+            const header = `
+
+            <tr>
+                <th>Author</th>
+                <th>Nama</th>
+                <th>Page Count</th>
+                <th>Publisher</th>
+                <th>Year</th>
+            </tr>`
+            var data = '';
+            res.data.forEach(item => {
+                data += `
+
+            <tr>
+                <td>${item.author}}</td>
+                <td>${item.nama}}</td>
+                <td>${item.page_count}}</td>
+                <td>${item.publisher}}</td>
+                <td>${item.year}}</td>
+            </tr>`
+                document.getElementById('data').innerHTML = header + data
+            });
+        }
+        getData()
+    </script>
+</body>
+</html>
